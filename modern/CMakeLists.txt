@@ -240,7 +240,7 @@ if(Qt6_FOUND)
             ui/qml/WidgetGuestCount.qml
             ui/qml/WidgetOrderList.qml
             ui/qml/WidgetPaymentPanel.qml
-            ui/qml/WidgetCheckList.qml
+            ui/qml/WidgetOpenChecks.qml
             ui/qml/WidgetKeyboard.qml
             ui/qml/WidgetClock.qml
             ui/qml/WidgetTableKey.qml

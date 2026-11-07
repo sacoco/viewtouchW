@@ -119,7 +119,7 @@ QJsonArray widgetSettings(const QString &kind)
                         u"The items sold most today, most first (the Popular page)"_s));
         out.append(hint(field(u"props.search"_s, u"Find by name"_s, u"bool"_s, g),
                         u"Shows the items whose name has what's typed on a keyboard panel (the Find page)"_s));
-    } else if (kind == u"checkList") {
+    } else if (kind == u"openChecks") {
         out.append(with(field(u"props.mode"_s, u"Lists"_s, u"enum"_s, g), u"options"_s,
                         options({{"", "Open checks (touch to open)"}, {"tabs", "Bar tabs"},
                                  {"merge", "Checks to merge into this one"}, {"closed", "Today's closed checks (reopen)"}})));
@@ -219,7 +219,7 @@ QStringList basicKinds()
 QStringList widgetKinds()
 {
     return {u"table"_s, u"tableGrid"_s, u"staffPicker"_s, u"checkHistory"_s, u"modifierPicker"_s,
-            u"soldOutList"_s, u"orderList"_s, u"loginPad"_s, u"guestCount"_s, u"checkList"_s,
+            u"soldOutList"_s, u"orderList"_s, u"loginPad"_s, u"guestCount"_s, u"openChecks"_s,
             u"paymentPanel"_s, u"numPad"_s, u"keyboard"_s, u"splitCheck"_s, u"drawerPanel"_s,
             u"reportView"_s, u"endOfDay"_s, u"logoutPanel"_s, u"clock"_s, u"statusBar"_s,
             u"adminPanel"_s, u"kitchenDisplay"_s, u"customerInfo"_s, u"customerLookup"_s, u"giftCard"_s, u"waitlist"_s, u"schedule"_s, u"factoryReset"_s, u"messageComposer"_s, u"network"_s, u"receiveDelivery"_s, u"stockCount"_s, u"wasteLog"_s, u"storeCheck"_s, u"prepLabels"_s, u"checkSearch"_s, u"orderLater"_s, u"menuGrid"_s, u"menuCategories"_s, u"menuBuilder"_s, u"timeClock"_s, u"dashboard"_s, u"checklist"_s, u"hostStand"_s, u"deliveryBoard"_s, u"decor"_s, u"floorPlan"_s, u"tableKey"_s, u"truckOrders"_s};
@@ -253,7 +253,7 @@ QJsonArray pageKindOptions()
 
 QJsonArray pageRoleOptions()
 {
-    return options({{"login", "Login"}, {"tables", "Tables"}, {"guestCount", "Guest count"}, {"checkList", "Open checks"},
+    return options({{"login", "Login"}, {"tables", "Tables"}, {"guestCount", "Guest count"}, {"openChecks", "Open checks"},
                     {"settle", "Payment"}, {"logout", "Log out"}, {"manager", "Manager"}, {"bar", "Bar"},
                     {"kitchen", "Kitchen"}, {"weigh", "Weighing"}, {"timeClock", "Time clock"}, {"menu", "Menu"}});
 }

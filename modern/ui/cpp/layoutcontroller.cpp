@@ -499,7 +499,7 @@ QVariantList LayoutController::pageChoices(const QString &only) const
     for (const vt::layout::Page &p : activeLayout().pages)
         // "start": what a device may start on: floor plans, Open Checks, menus, tabs, deliveries.
         if (p.kind != u"template" && p.kind != u"library" && (only != u"floor" || floor(p))
-            && (only != u"start" || (p.variantOf.isEmpty() && (floor(p) || p.kind == u"items" || p.role == u"checkList"
+            && (only != u"start" || (p.variantOf.isEmpty() && (floor(p) || p.kind == u"items" || p.role == u"openChecks"
                                                                || p.id == u"tabs" || p.id == u"deliveries"))))
             out.append(QVariantMap{{u"value"_s, p.id}, {u"text"_s, p.name}});
     return out;
@@ -613,7 +613,7 @@ void LayoutController::selectTable(const QString &label)
             break;
         case PosSession::TableChooseCheck:
             // Several checks at the table: pick one from the (filtered) list.
-            if (const QString page = rolePage(u"checkList"_s); !page.isEmpty())
+            if (const QString page = rolePage(u"openChecks"_s); !page.isEmpty())
                 navigate(Navigator::Mode::Push, page);
             break;
         default:
@@ -635,7 +635,7 @@ void LayoutController::payTable(const QString &label)
                 navigate(Navigator::Mode::Index);
             break;
         case PosSession::TableChooseCheck:
-            if (const QString page = rolePage(u"checkList"_s); !page.isEmpty())
+            if (const QString page = rolePage(u"openChecks"_s); !page.isEmpty())
                 navigate(Navigator::Mode::Push, page);
             break;
         case PosSession::TableNeedsGuests:

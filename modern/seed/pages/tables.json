@@ -920,7 +920,7 @@
         {
           "type": "jump",
           "mode": "push",
-          "role": "checkList"
+          "role": "openChecks"
         }
       ]
     },
@@ -1082,7 +1082,7 @@
     },
     {
       "id": "my-checks",
-      "kind": "checkList",
+      "kind": "openChecks",
       "rect": {
         "x": 1472,
         "y": 704,

@@ -25,7 +25,7 @@
     },
     {
       "id": "list",
-      "kind": "checkList",
+      "kind": "openChecks",
       "rect": {
         "x": 16,
         "y": 112,

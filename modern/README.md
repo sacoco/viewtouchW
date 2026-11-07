@@ -573,7 +573,7 @@ Log in with a demo PIN: **1234** (manager), **1111** (server) or **2222** (cashi
 | numPad | Number or amount entry (`props.mode: "amount"`) |
 | orderList | The current check |
 | paymentPanel | Payments and the balance |
-| checkList | Open checks |
+| openChecks | Open checks |
 | keyboard | Kitchen notes |
 | clock | Time and date |
 | logoutPanel | Who is on shift |

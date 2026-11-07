@@ -127,7 +127,7 @@ About 15 of the old zone types (STANDARD, SIMPLE, CONDITIONAL, TOGGLE, SWITCH, I
 | `logoutPanel` | LOGOUT | Clock out, break, save |
 | `table` | TABLE | One table per zone, placed in the editor, showing live status (an earlier single `tableMap` panel is converted on load) |
 | `guestCount` | GUEST_COUNT | Enter number of guests |
-| `checkList` | CHECK_LIST | List of open checks |
+| `openChecks` | CHECK_LIST | List of open checks |
 | `orderList` | ORDER_ENTRY | Current check: select, modify, seat/check paging |
 | `paymentPanel` | PAYMENT_ENTRY | Payments applied and balance |
 | `numPad` | STANDARD digit buttons | Built-in number pad |
@@ -211,7 +211,7 @@ About 15 of the old zone types (STANDARD, SIMPLE, CONDITIONAL, TOGGLE, SWITCH, I
 **M3 – Core POS flow**
 - Domain: money, tax, menu, check, order, modifiers, employee/roles.
 - SQLite repos with migrations.
-- Widgets: loginPad, tableMap, guestCount, orderList, numPad, keyboard, paymentPanel, checkList.
+- Widgets: loginPad, tableMap, guestCount, orderList, numPad, keyboard, paymentPanel, openChecks.
 - Actions: addItem with modifier sequences, qualifier, tender, and the commands send/void/pay/logout.
 - End-to-end result: log in → table → order → send → pay → close.
 

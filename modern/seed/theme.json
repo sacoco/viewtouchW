@@ -133,7 +133,7 @@
         "bold": false
       }
     },
-    "checkList": {
+    "openChecks": {
       "normal": {
         "fill": "#232933",
         "frame": "flat",

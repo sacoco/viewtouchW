@@ -339,7 +339,7 @@ TEST_CASE("Widgets: their settings, built-in buttons and button look are in the 
     CHECK(kds.contains(u"props.buttons.recall.hide"_s));
     CHECK(kds.contains(u"props.buttons.recall.label"_s));
     CHECK(kds.contains(u"style.normal.keyFill"_s));
-    CHECK(paths(u"checkList"_s).contains(u"props.mode"_s));
+    CHECK(paths(u"openChecks"_s).contains(u"props.mode"_s));
     CHECK(paths(u"reportView"_s).contains(u"props.report"_s));
     CHECK_FALSE(paths(u"button"_s).contains(u"style.normal.keyFill"_s));   // plain buttons have no built-ins
 

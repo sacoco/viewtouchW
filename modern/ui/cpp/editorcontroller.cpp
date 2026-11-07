@@ -284,7 +284,7 @@ QString EditorController::kindName(const QString &kind) const
         {u"orderList"_s, QT_TR_NOOP("Order list")},
         {u"loginPad"_s, QT_TR_NOOP("Login keypad")},
         {u"guestCount"_s, QT_TR_NOOP("Guest count")},
-        {u"checkList"_s, QT_TR_NOOP("Open checks")},
+        {u"openChecks"_s, QT_TR_NOOP("Open checks")},
         {u"paymentPanel"_s, QT_TR_NOOP("Payment panel")},
         {u"numPad"_s, QT_TR_NOOP("Number keypad")},
         {u"keyboard"_s, QT_TR_NOOP("Keyboard")},

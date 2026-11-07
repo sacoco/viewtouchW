@@ -467,7 +467,7 @@
         {
           "type": "jump",
           "mode": "push",
-          "role": "checkList"
+          "role": "openChecks"
         }
       ]
     },
