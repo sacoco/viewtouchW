@@ -33,7 +33,7 @@ struct Options {
     QCommandLineOption headless{u"headless"_s, u"Serve without a screen of its own (use with --serve)."_s};
     QCommandLineOption connect{u"connect"_s,
         u"Run as a terminal of the server at <host[:port]>, or \"auto\": the one it paired with, else "
-        "find and pair with one on screen."_s, u"host"_s};
+        u"find and pair with one on screen."_s, u"host"_s};
     QCommandLineOption pair{u"pair"_s,
         u"Pair this terminal with the --connect server using <code> from Manager → Terminals."_s, u"code"_s};
     QCommandLineOption terminal{u"terminal"_s, u"This terminal's name (default: the computer's name)."_s, u"name"_s};
@@ -41,7 +41,7 @@ struct Options {
     QCommandLineOption page{u"page"_s, u"Open page <id> at startup."_s, u"id"_s};
     QCommandLineOption station{u"station"_s,
         u"The home screen of a computer only for ViewTouch: starts ViewTouch (again if it stops), with icons for "
-        "the network, updates, restarting... (vtmodern-station.service)."_s};
+        u"the network, updates, restarting... (vtmodern-station.service)."_s};
     QCommandLineOption afterLogin{u"after-login"_s,
         u"After the first login, open page <id> (\"setup\": the setup guide)."_s, u"id"_s};
     QCommandLineOption edit{u"edit"_s, u"Start in edit mode (with --login and a manager's PIN)."_s};
@@ -52,34 +52,34 @@ struct Options {
     QCommandLineOption standby{u"standby"_s,
         u"Be the store's standby server: keep a live copy of the main server's data, ready to take over if it "
          "stops (a manager does it from any screen). <server>: the main server's address, or auto. The first "
-         "time, add --pair with a code from Manager -> Terminals."_s, u"server"_s};
+         u"time, add --pair with a code from Manager -> Terminals."_s, u"server"_s};
     QCommandLineOption pairOnly{u"pair-only"_s,
         u"With --standby and --pair: pair, save it, and exit (vtmodern-setup; the service then runs it)."_s};
     QCommandLineOption factoryReset{u"factory-reset"_s,
         u"Back to a fresh install: back up the database, then delete it (sales, customers, staff, menu, pages, "
          "settings). The next start begins with the starter set. Backups and saved exports stay. ViewTouch must "
-         "not be running."_s};
+         u"not be running."_s};
     QCommandLineOption empty{u"empty"_s,
         u"With --factory-reset: the next start begins with an empty store (no menu, tables, sample staff, "
-         "printers or tax rates; one sample manager to run the setup guide)."_s};
+         u"printers or tax rates; one sample manager to run the setup guide)."_s};
     QCommandLineOption demoData{u"demo-data"_s,
         u"Fill a store that has no sales yet with demo history (two months, and the same months last year), "
-         "customers, gift cards, a schedule and a waitlist, then exit."_s};
+         u"customers, gift cards, a schedule and a waitlist, then exit."_s};
     QCommandLineOption customerDisplay{u"customer-display"_s,
         u"Show the order and total to the guest: window (a full-screen window on the second monitor), split (one "
-         "window across two monitors, as a kiosk has), auto (split with --kiosk, else window) or off."_s,
+         u"window across two monitors, as a kiosk has), auto (split with --kiosk, else window) or off."_s,
         u"mode"_s, u"off"_s};
     QCommandLineOption selfOrder{u"self-order"_s,
         u"This screen is a self-order kiosk: guests order on their own and pay at the counter. A manager's PIN "
-         "(hold the top-left corner) ends it. Also set per terminal in Manager -> Terminals."_s};
+         u"(hold the top-left corner) ends it. Also set per terminal in Manager -> Terminals."_s};
     QCommandLineOption touchKeyboard{u"touch-keyboard"_s,
         u"Show an on-screen keyboard for text fields: yes or no (default: the terminal's setting, "
-          "Manager -> Terminals; on, except on Android, which has its own)."_s, u"yes|no"_s};
+          u"Manager -> Terminals; on, except on Android, which has its own)."_s, u"yes|no"_s};
     QCommandLineOption screen{u"screen"_s,
         u"Pages for this screen: phone (phone versions, portrait), standard, auto "
         "(phones get phone pages; the default on Android), timeClock (only clocking in and out "
         "and schedules), or nowServing (a TV for guests: orders being made and ready). "
-        "Overrides Manager → Terminals."_s, u"mode"_s};
+        u"Overrides Manager → Terminals."_s, u"mode"_s};
     QCommandLineOption windowed{u"windowed"_s,
         u"Start in a window instead of full screen (also with --size). F11 switches either way."_s};
     QCommandLineOption backupDir{u"backup-dir"_s, u"Where backups go (default: <data dir>/backups)."_s, u"dir"_s};
@@ -91,22 +91,22 @@ struct Options {
     QCommandLineOption backup{u"backup"_s, u"Back up the database now (safe while ViewTouch runs) and exit."_s};
     QCommandLineOption snapshot{u"snapshot"_s,
         u"Copy the database to <file> now (safe while ViewTouch runs), never encrypted, and exit: what an update "
-         "goes back to if the new ViewTouch doesn't start properly (vtmodern-device)."_s, u"file"_s};
+         u"goes back to if the new ViewTouch doesn't start properly (vtmodern-device)."_s, u"file"_s};
     QCommandLineOption maintainerPin{u"maintainer-pin"_s,
         u"Set this store's maintainer code (4 to 8 digits; \"off\" removes it; \"-\": read from the input) and exit: the store's "
         "technician logs in with it, for what managers and the owner can't do (erasing the store, updates, "
-        "the network and the standby, templates, backups). It's only set here, on the store's computer."_s,
+        u"the network and the standby, templates, backups). It's only set here, on the store's computer."_s,
         u"pin"_s};
     QCommandLineOption pairingCode{u"pairing-code"_s,
         u"Ask the ViewTouch server running on this machine (same --data-dir) for a code to pair a "
-        "terminal with, print it, and exit."_s};
+        u"terminal with, print it, and exit."_s};
     QCommandLineOption restore{u"restore"_s,
         u"Put backup <file> in place of the database and exit. ViewTouch must not be running. An encrypted "
-         "backup (.vtbak) asks for the backup password (or reads VTM_BACKUP_PASSWORD)."_s, u"file"_s};
+         u"backup (.vtbak) asks for the backup password (or reads VTM_BACKUP_PASSWORD)."_s, u"file"_s};
 
     QCommandLineOption stress{u"stress"_s,
         u"A live stress test: a busy dinner on a throwaway store (a new folder, unless --data-dir names an empty "
-         "one), pretend staff working this screen and handhelds, measured as it runs; a report at the end."_s};
+         u"one), pretend staff working this screen and handhelds, measured as it runs; a report at the end."_s};
     QCommandLineOption stressMinutes{u"stress-minutes"_s, u"How long the stress test runs (default 10)."_s,
         u"minutes"_s, u"10"_s};
     QCommandLineOption stressSpeed{u"stress-speed"_s,
@@ -114,7 +114,7 @@ struct Options {
     QCommandLineOption stressServers{u"stress-servers"_s, u"Pretend servers (default 6)."_s, u"count"_s, u"6"_s};
     QCommandLineOption stressHours{u"stress-hours"_s,
         u"A whole business day this long instead (6 or more: a lunch rush and a dinner rush), at --stress-speed; "
-         "ends with everyone counting their bank and End of Day."_s, u"hours"_s};
+         u"ends with everyone counting their bank and End of Day."_s, u"hours"_s};
     QCommandLineOption stressLoad{u"stress-load"_s,
         u"Times the staff, tables, guests and handhelds (default 1; up to 5)."_s, u"times"_s, u"1"_s};
     QCommandLineOption stressExit{u"stress-exit"_s, u"Quit when the stress test is done (exit code 0: passed)."_s};

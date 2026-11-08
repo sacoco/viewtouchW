@@ -28,7 +28,7 @@
 // that the database holds exactly what the screen does.
 
 namespace vt::app { class PosShared; class PosSession; }
-namespace vt::layout { struct Layout; }
+namespace vt::layout { class Layout; }
 namespace vt::storage { class AsyncWriter; }
 
 namespace vt::net {

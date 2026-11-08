@@ -6,6 +6,7 @@
 #include <compare>
 #include <cstdint>
 #include <cstdlib>
+#include <limits>
 #include <string>
 
 namespace vt {
@@ -31,7 +32,25 @@ public:
     constexpr Money scaled(std::int64_t numerator, std::int64_t denominator) const
     {
         std::int64_t num = 0;
-        if (__builtin_mul_overflow(cents_, numerator, &num)) {
+#if defined(__GNUC__) || defined(__clang__)
+        const bool overflowed = __builtin_mul_overflow(cents_, numerator, &num);
+#else
+        // MSVC has no constexpr-friendly overflow-checked multiply intrinsic
+        // (unlike GCC/Clang's builtin above). Detect the overflow by
+        // magnitude first — multiplying before knowing it's safe would
+        // itself be undefined behavior — then multiply only once proven
+        // safe. `ub > limit / ua` (integer division) is exact: no false
+        // positives or negatives, for every int64 input including INT64_MIN.
+        const std::uint64_t ua = cents_ < 0 ? 0u - std::uint64_t(cents_) : std::uint64_t(cents_);
+        const std::uint64_t ub = numerator < 0 ? 0u - std::uint64_t(numerator) : std::uint64_t(numerator);
+        const std::uint64_t limit = (cents_ < 0) != (numerator < 0)
+            ? std::uint64_t(std::numeric_limits<std::int64_t>::max()) + 1   // |INT64_MIN|
+            : std::uint64_t(std::numeric_limits<std::int64_t>::max());
+        const bool overflowed = ua != 0 && ub > limit / ua;
+        if (!overflowed)
+            num = cents_ * numerator;
+#endif
+        if (overflowed) {
             // Past what 64 bits hold (only an absurd amount: a damaged
             // record): near enough in long double, held to what fits,
             // never undefined.

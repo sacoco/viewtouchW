@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <atomic>
 #include <cmath>
-#include <unistd.h>
 
 using namespace Qt::StringLiterals;
 
@@ -1112,23 +1111,41 @@ int percentile(std::vector<int> v, double p)
     return v[i];
 }
 
-// This process's memory (MB) and CPU time (clock ticks).
+// This process's memory (MB) and CPU time (clock ticks). Linux-only (reads
+// /proc): elsewhere there's no number to give, same as when /proc is
+// missing on Linux itself (a container without it).
 double residentMb()
 {
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     QFile f(u"/proc/self/statm"_s);
     if (!f.open(QIODevice::ReadOnly))
         return 0;
     const QList<QByteArray> parts = f.readAll().split(' ');
     return parts.size() > 1 ? double(parts[1].toLongLong()) * double(sysconf(_SC_PAGESIZE)) / 1048576.0 : 0;
+#else
+    return 0;
+#endif
 }
 qint64 cpuTicks()
 {
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     QFile f(u"/proc/self/stat"_s);
     if (!f.open(QIODevice::ReadOnly))
         return 0;
     const QByteArray s = f.readAll();
     const QList<QByteArray> parts = s.mid(s.lastIndexOf(')') + 2).split(' ');
     return parts.size() > 12 ? parts[11].toLongLong() + parts[12].toLongLong() : 0;
+#else
+    return 0;
+#endif
+}
+long clkTck()
+{
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+    return sysconf(_SC_CLK_TCK);
+#else
+    return 1;   // unused: cpuTicks() above is always 0 here, so cpu_ is never computed from this
+#endif
 }
 
 } // namespace
@@ -1145,7 +1162,7 @@ void StressRunner::everySecond()
     }
     const qint64 ticks = cpuTicks(), t = clock_.elapsed();
     if (cpuTicks_ > 0 && t > cpuAt_)
-        cpu_ = 100.0 * double(ticks - cpuTicks_) / double(sysconf(_SC_CLK_TCK)) / (double(t - cpuAt_) / 1000.0);
+        cpu_ = 100.0 * double(ticks - cpuTicks_) / double(clkTck()) / (double(t - cpuAt_) / 1000.0);
     cpuTicks_ = ticks;
     cpuAt_ = t;
     rssMb_ = residentMb();
