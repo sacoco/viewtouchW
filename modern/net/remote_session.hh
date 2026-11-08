@@ -88,6 +88,12 @@ public:
     QString clockedInSince() const override { return v(u"clockedInSince").toString(); }
     QString storeName() const override { return v(u"storeName").toString(); }
     QString currencySymbol() const override { return v(u"currencySymbol").toString(); }
+    // Already resolved by the store's own server (its own computer, or
+    // the setting there) - never this device's: every paired screen
+    // agrees, regardless of each one's own region.
+    QString decimalSeparator() const override { return v(u"decimalSeparator").toString(); }
+    QString thousandsSeparator() const override { return v(u"thousandsSeparator").toString(); }
+    int decimalPlaces() const override { return v(u"decimalPlaces").toInt(); }
     QStringList customColors() const override { return v(u"customColors").toStringList(); }
     QVariantList priceChanges() const override { return v(u"priceChanges").toList(); }
     int pinLength() const override { return v(u"pinLength").toInt(); }

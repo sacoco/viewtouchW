@@ -44,7 +44,7 @@ std::vector<std::string> Report::find(const std::string &label) const
 
 std::string ReportContext::money(Money m) const
 {
-    const std::string s = m.toString();
+    const std::string s = m.format(decimalSeparator, thousandsSeparator, settings.decimalPlaces);
     return s.front() == '-' ? "-" + settings.currencySymbol + s.substr(1) : settings.currencySymbol + s;
 }
 

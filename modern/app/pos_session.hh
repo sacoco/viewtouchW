@@ -41,6 +41,9 @@ class PosSession : public QObject {
     Q_PROPERTY(QString clockedInSince READ clockedInSince NOTIFY sessionChanged)
     Q_PROPERTY(QString storeName READ storeName NOTIFY adminChanged)
     Q_PROPERTY(QString currencySymbol READ currencySymbol NOTIFY adminChanged)
+    Q_PROPERTY(QString decimalSeparator READ decimalSeparator NOTIFY adminChanged)
+    Q_PROPERTY(QString thousandsSeparator READ thousandsSeparator NOTIFY adminChanged)
+    Q_PROPERTY(int decimalPlaces READ decimalPlaces NOTIFY adminChanged)
     Q_PROPERTY(QStringList customColors READ customColors NOTIFY adminChanged)
     Q_PROPERTY(QVariantList priceChanges READ priceChanges NOTIFY adminChanged)
 
@@ -278,6 +281,11 @@ public:
     virtual QString clockedInSince() const = 0;
     virtual QString storeName() const = 0;
     virtual QString currencySymbol() const = 0;
+    // How a price is punctuated and rounded, resolved already (see
+    // app::i18n): this computer's own, unless the store overrides it.
+    virtual QString decimalSeparator() const = 0;
+    virtual QString thousandsSeparator() const = 0;
+    virtual int decimalPlaces() const = 0;
     virtual QStringList customColors() const = 0;
     // Price changes set for later: [{id, when ("Mon Oct 12, 6:00 AM"), label, count}].
     virtual QVariantList priceChanges() const = 0;

@@ -88,7 +88,7 @@ std::string TicketContext::tr(const std::string &english, std::initializer_list<
 
 std::string TicketContext::money(Money m) const
 {
-    const std::string s = m.toString();
+    const std::string s = m.format(decimalSeparator, thousandsSeparator, settings.decimalPlaces);
     return s.front() == '-' ? "-" + settings.currencySymbol + s.substr(1) : settings.currencySymbol + s;
 }
 

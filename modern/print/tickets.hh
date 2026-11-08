@@ -21,6 +21,11 @@ struct TicketContext {
     std::function<std::vector<std::string>(const std::vector<std::string> &)> allergenNames;
     // An English phrase in the store's language (none, or not translated: as is).
     std::function<std::string(const std::string &)> words;
+    // Already resolved (see app::i18n): this computer's own, unless the
+    // store overrides it. "." and "" match how a ticket always looked, so
+    // building one of these without them keeps doing that.
+    std::string decimalSeparator = ".";
+    std::string thousandsSeparator;
 
     std::string money(Money m) const;
     // A printed phrase in the store's language; %1, %2... filled with `args`.

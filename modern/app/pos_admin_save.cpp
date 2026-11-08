@@ -324,6 +324,10 @@ bool PosService::saveAdminRecord(const QString &panel, int index, const QVariant
         if (record.contains(u"orderNumbers"_s))
             s_->settings.orderNumbers = record.value(u"orderNumbers"_s).toBool();
         s_->settings.currencySymbol = ss(record.value(u"currencySymbol"_s).toString());
+        s_->settings.decimalSeparator = ss(record.value(u"decimalSeparator"_s).toString());
+        s_->settings.thousandsSeparator = ss(record.value(u"thousandsSeparator"_s).toString());
+        if (record.contains(u"decimalPlaces"_s))
+            s_->settings.decimalPlaces = std::clamp(record.value(u"decimalPlaces"_s).toInt(), 0, 2);
         s_->settings.receiptHeader = ss(record.value(u"receiptHeader"_s).toString());
         s_->settings.receiptFooter = ss(record.value(u"receiptFooter"_s).toString());
         if (record.contains(u"receiptFreeChoices"_s))

@@ -113,7 +113,8 @@ ReportContext PosService::reportContext(const QString &period) const
                          weekStart,
                          [](std::int64_t ms) {
                              return ss(i18n::locale().toString(QDateTime::fromMSecsSinceEpoch(ms).date(), u"MMM d"_s));
-                         }};
+                         },
+                         ss(i18n::decimalSeparator(s_->settings)), ss(i18n::thousandsSeparator(s_->settings))};
 }
 
 // --- receipts ------------------------------------------------------------------------

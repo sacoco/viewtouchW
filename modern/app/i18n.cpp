@@ -159,6 +159,29 @@ QLocale locale(const QString &code)
     return QLocale(wanted.language(), system.territory());
 }
 
+namespace {
+// The pair is one choice, not two: an empty thousandsSeparator can mean
+// "none" (every point release before this one) just as well as "not set",
+// so whether to follow this computer's own region is decided once, for
+// both - the store set at least one of them, or it set neither.
+bool storeChoseAFormat(const core::PosSettings &settings)
+{
+    return !settings.decimalSeparator.empty() || !settings.thousandsSeparator.empty();
+}
+} // namespace
+
+QString decimalSeparator(const core::PosSettings &settings)
+{
+    return storeChoseAFormat(settings) ? QString::fromStdString(settings.decimalSeparator)
+                                        : QLocale::system().decimalPoint();
+}
+
+QString thousandsSeparator(const core::PosSettings &settings)
+{
+    return storeChoseAFormat(settings) ? QString::fromStdString(settings.thousandsSeparator)
+                                        : QLocale::system().groupSeparator();
+}
+
 QString timeText(const QTime &time, const QString &code)
 {
     return locale(code).toString(time, u"h:mm AP"_s);

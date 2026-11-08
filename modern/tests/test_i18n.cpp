@@ -3,6 +3,7 @@
 #include "editorcontroller.hh"
 #include "layout_fixture.hh"
 #include "app/i18n.hh"
+#include "core/settings.hh"
 #include "pos_fixture.hh"
 #include "qt_catch.hh"
 
@@ -206,4 +207,37 @@ TEST_CASE("Spanish: reports, the tax line, dates and the staff list", "[i18n]")
     for (const QVariant &r : pos.adminRecords(u"employees"_s))
         server = server || r.toMap()[u"_detail"_s].toString().startsWith(u"Mesero"_s);
     CHECK(server);
+}
+
+TEST_CASE("How a price looks: the store's choice, or this computer's own region", "[i18n][money]")
+{
+    core::PosSettings settings;
+    // Unset (the ordinary case): this computer's own - a Spanish-speaking
+    // cashier on a US-region computer still sees "1,234.56", not "1.234,56"
+    // just because the screen is in Spanish.
+    CHECK(i18n::decimalSeparator(settings) == QLocale::system().decimalPoint());
+    CHECK(i18n::thousandsSeparator(settings) == QLocale::system().groupSeparator());
+    // A store's own choice always wins, regardless of this computer's region
+    // (a shared corporate image, say, or making every paired screen agree).
+    settings.decimalSeparator = ",";
+    settings.thousandsSeparator = ".";
+    CHECK(i18n::decimalSeparator(settings) == u","_s);
+    CHECK(i18n::thousandsSeparator(settings) == u"."_s);
+}
+
+TEST_CASE("A store's number format is one choice, not two: setting either one, both are exact", "[i18n][money]")
+{
+    // Only the decimal point set: no grouping at all is what it means
+    // (this is how every point release before this one printed a price),
+    // not "ask this computer's region for the other half."
+    core::PosSettings settings;
+    settings.decimalSeparator = ".";
+    CHECK(i18n::decimalSeparator(settings) == u"."_s);
+    CHECK(i18n::thousandsSeparator(settings) == u""_s);
+    // The same the other way around: only a grouping character set, the
+    // decimal point is read as empty rather than guessed from the region.
+    core::PosSettings grouped;
+    grouped.thousandsSeparator = u" "_s.toStdString();
+    CHECK(i18n::thousandsSeparator(grouped) == u" "_s);
+    CHECK(i18n::decimalSeparator(grouped) == u""_s);
 }

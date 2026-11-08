@@ -4,6 +4,8 @@
 #include <QTimer>
 
 #include "app/i18n.hh"
+#include "app/pos_json.hh"
+#include "core/money.hh"
 
 #include <QHash>
 
@@ -13,16 +15,16 @@ namespace vt::app {
 
 QString PosSession::formatCents(qint64 cents) const
 {
-    const qint64 a = cents < 0 ? -cents : cents;
-    const QString s = u"%1%2.%3"_s.arg(currencySymbol()).arg(a / 100).arg(a % 100, 2, 10, QChar(u'0'));
-    return cents < 0 ? u"-"_s + s : s;
+    const QString s = qs(Money::fromCents(cents).format(decimalSeparator().toStdString(),
+                                                          thousandsSeparator().toStdString(), decimalPlaces()));
+    return s.startsWith(u'-') ? u"-"_s + currencySymbol() + s.mid(1) : currencySymbol() + s;
 }
 
 const QStringList &PosSession::stateKeys()
 {
     static const QStringList keys = {
         u"terminalName"_s, u"loggedIn"_s, u"userName"_s, u"userRole"_s, u"permissions"_s, u"clockedIn"_s,
-        u"clockedInSince"_s, u"storeName"_s, u"currencySymbol"_s, u"customColors"_s, u"priceChanges"_s, u"pinLength"_s, u"entry"_s, u"entryAmount"_s,
+        u"clockedInSince"_s, u"storeName"_s, u"currencySymbol"_s, u"decimalSeparator"_s, u"thousandsSeparator"_s, u"decimalPlaces"_s, u"customColors"_s, u"priceChanges"_s, u"pinLength"_s, u"entry"_s, u"entryAmount"_s,
         u"entryGuests"_s, u"textEntry"_s, u"pendingQualifier"_s, u"pendingTable"_s, u"hasCheck"_s, u"check"_s, u"tableChecks"_s, u"undoText"_s,
         u"lines"_s, u"totals"_s, u"payments"_s, u"selectedLine"_s, u"selectedPayment"_s, u"openChecks"_s, u"openChecksShared"_s, u"openChecksViewer"_s, u"floor"_s, u"deliveries"_s, u"drivers"_s, u"popularItems"_s, u"myUsuals"_s, u"stockLeft"_s, u"dashboard"_s, u"checklists"_s,
         u"checkFilter"_s, u"kitchenTickets"_s, u"rushRadar"_s, u"drawer"_s, u"day"_s, u"days"_s, u"adminRevision"_s,
