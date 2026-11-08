@@ -88,7 +88,7 @@ QString PosService::imageUrl(const QString &ref) const
         const QString file = s_->imageFile(ref);
         return file.isEmpty() ? QString() : QUrl::fromLocalFile(file).toString();
     }
-    if (ref.startsWith(u'/'))
+    if (QDir::isAbsolutePath(ref))
         return QUrl::fromLocalFile(ref).toString();
     return ref;   // qrc:, file:, http...
 }
@@ -217,19 +217,27 @@ QVariantList PosSession::pictureFiles() const
     // Where people keep pictures: this account's folders, and each person's
     // on a ViewTouch computer (it runs as its own account); USB sticks.
     QList<std::pair<QString, QString>> places;   // folder, how it's called
-    for (const auto where : {QStandardPaths::PicturesLocation, QStandardPaths::DocumentsLocation,
-                             QStandardPaths::DownloadLocation, QStandardPaths::DesktopLocation})
-        places.append({QStandardPaths::writableLocation(where), QStandardPaths::displayName(where)});
-    for (const QFileInfo &home : QDir(u"/home"_s).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot))
+    // Tests only: a sandboxed "home" instead of the real account folders -
+    // QStandardPaths asks the OS for those (Windows ignores HOME entirely),
+    // so there's no portable way to redirect it without this seam.
+    if (const QString testRoot = qEnvironmentVariable("VTM_PICTURE_TEST_ROOT"); !testRoot.isEmpty()) {
         for (const char *sub : {"Pictures", "Documents", "Downloads", "Desktop"})
-            places.append({home.filePath() + u'/' + QString::fromLatin1(sub),
-                           QString::fromLatin1(sub) + u" ("_s + home.fileName() + u')'});
-    for (const QString &root : {u"/run/vtmodern-usb"_s, u"/media"_s, u"/run/media"_s})
-        for (const QFileInfo &d : QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-            places.append({d.filePath(), tr("USB stick")});
-            for (const QFileInfo &dd : QDir(d.filePath()).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot))
-                places.append({dd.filePath(), tr("USB stick")});
-        }
+            places.append({testRoot + u'/' + QString::fromLatin1(sub), QString::fromLatin1(sub)});
+    } else {
+        for (const auto where : {QStandardPaths::PicturesLocation, QStandardPaths::DocumentsLocation,
+                                 QStandardPaths::DownloadLocation, QStandardPaths::DesktopLocation})
+            places.append({QStandardPaths::writableLocation(where), QStandardPaths::displayName(where)});
+        for (const QFileInfo &home : QDir(u"/home"_s).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot))
+            for (const char *sub : {"Pictures", "Documents", "Downloads", "Desktop"})
+                places.append({home.filePath() + u'/' + QString::fromLatin1(sub),
+                               QString::fromLatin1(sub) + u" ("_s + home.fileName() + u')'});
+        for (const QString &root : {u"/run/vtmodern-usb"_s, u"/media"_s, u"/run/media"_s})
+            for (const QFileInfo &d : QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+                places.append({d.filePath(), tr("USB stick")});
+                for (const QFileInfo &dd : QDir(d.filePath()).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot))
+                    places.append({dd.filePath(), tr("USB stick")});
+            }
+    }
     QList<std::pair<QFileInfo, QString>> found;   // the file, where it is
     QSet<QString> seen;
     for (const auto &[folder, label] : places) {

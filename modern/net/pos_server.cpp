@@ -929,7 +929,7 @@ QVariantList PosServer::connections() const
 namespace {
 
 // What a file is for, from its name: the app for a tablet's processor, or a
-// package for a Linux screen's ("" if neither).
+// package for a Linux or Windows screen's ("" if none of those).
 QString platformOf(const QString &name)
 {
     const QString n = name.toLower();
@@ -942,6 +942,10 @@ QString platformOf(const QString &name)
     if (n.endsWith(u".deb"_s) || n.endsWith(u".rpm"_s)) {
         if (n.contains(u"x86_64"_s) || n.contains(u"amd64"_s)) return u"linux-x86_64"_s;
         if (n.contains(u"aarch64"_s) || n.contains(u"arm64"_s)) return u"linux-arm64"_s;
+    }
+    if (n.endsWith(u".msi"_s)) {
+        if (n.contains(u"arm64"_s)) return u"windows-arm64"_s;
+        if (n.contains(u"x64"_s) || n.contains(u"x86_64"_s) || n.contains(u"amd64"_s)) return u"windows-x86_64"_s;
     }
     return {};
 }

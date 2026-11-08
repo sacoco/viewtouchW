@@ -222,7 +222,7 @@ RemoteSession::RemoteSession(QString terminalName, QObject *parent)
 
 QString RemoteSession::localImage(const QString &serverPath, const QString &cacheKey) const
 {
-    if (serverPath.isEmpty() || !(serverPath.startsWith(u'/') || serverPath.startsWith(u"store:")))
+    if (serverPath.isEmpty() || !(QDir::isAbsolutePath(serverPath) || serverPath.startsWith(u"store:")))
         return serverPath;   // a resource or web address: as it is
     const QString key = cacheKey.isEmpty() ? serverPath : cacheKey;
     const auto it = images_.constFind(key);
@@ -272,7 +272,7 @@ QString RemoteSession::imageUrl(const QString &ref) const
         for (const QVariant &v : this->v(u"storeImages").toList())
             if (v.toMap().value(u"ref"_s).toString() == ref)
                 key = ref + u'#' + v.toMap().value(u"hash"_s).toString();
-    } else if (!ref.startsWith(u'/')) {
+    } else if (!QDir::isAbsolutePath(ref)) {
         return ref;
     }
     const QString local = localImage(ref, key);
