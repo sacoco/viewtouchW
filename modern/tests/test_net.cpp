@@ -635,7 +635,11 @@ TEST_CASE("Updates: a screen behind the store is told, and a manager there gets 
     const net::AppBuild me = net::appBuild();
     // An update for screens like this one, newer than this build; one for another kind; one unnamed.
     const QString arch = me.platform.section(u'-', 1);
+#if defined(Q_OS_WIN)
+    const QString mine = u"ViewTouchModern_0.7.0_%1-b%2.msi"_s.arg(arch == u"x86_64"_s ? u"x64"_s : arch).arg(me.number + 5);
+#else
     const QString mine = u"viewtouch-modern_0.7.0_%1-b%2.deb"_s.arg(arch == u"x86_64"_s ? u"amd64"_s : u"arm64"_s).arg(me.number + 5);
+#endif
     QByteArray payload(3 * 1024 * 1024 + 123, '\0');   // more than one part
     for (int i = 0; i < payload.size(); ++i)
         payload[i] = char(i * 7);
@@ -645,7 +649,15 @@ TEST_CASE("Updates: a screen behind the store is told, and a manager there gets 
         REQUIRE(f.open(QIODevice::WriteOnly));
         f.write(bytes);
     }
+#if defined(Q_OS_WIN)
+    REQUIRE(me.platform.startsWith(u"windows-"_s));
+#elif defined(Q_OS_MACOS)
+    REQUIRE(me.platform.startsWith(u"macos-"_s));
+#elif defined(Q_OS_ANDROID)
+    REQUIRE(me.platform.startsWith(u"android-"_s));
+#else
     REQUIRE(me.platform.startsWith(u"linux-"_s));
+#endif
     CHECK(store.server.updateFiles().size() == 2);
     CHECK(store.server.updateFor(me.platform, me.number).build == me.number + 5);
     CHECK(store.server.updateFor(me.platform, me.number + 5).path.isEmpty());   // nothing newer than that
@@ -729,6 +741,7 @@ TEST_CASE("Updates: phones and tablets get the store's newer app by themselves w
     QFile got(idle->updateInfo()[u"ready"_s].toString());
     REQUIRE(got.open(QIODevice::ReadOnly));
     CHECK(got.readAll() == payload);
+    got.close();   // done with it: Phone 1's own download, below, saves to the same name
     waitFor([] { return false; }, 400);
     CHECK_FALSE(busy->updateInfo().contains(u"ready"_s));
     CHECK_FALSE(busy->updateInfo().contains(u"downloading"_s));

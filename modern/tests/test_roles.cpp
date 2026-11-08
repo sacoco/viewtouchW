@@ -522,6 +522,9 @@ TEST_CASE("Station: a backup made, the store changed, the backup restored by tou
 
 TEST_CASE("Station: the computer's commands go to the helper as they should", "[station][helper]")
 {
+#ifndef Q_OS_UNIX
+    SKIP("the station helper is a POSIX shell script, run with sudo; Windows kiosk parity is future work");
+#endif
     QTemporaryDir dir;
     // A pretend helper: notes what it's asked, says the last line back; "fail" fails.
     const QString log = dir.filePath(u"asked.txt"_s);
@@ -586,6 +589,9 @@ TEST_CASE("Station: the computer's commands go to the helper as they should", "[
 
 TEST_CASE("Station: a new ViewTouch looked for twice a day, installed at night only when allowed", "[station][helper][updates]")
 {
+#ifndef Q_OS_UNIX
+    SKIP("the station helper is a POSIX shell script, run with sudo; Windows kiosk parity is future work");
+#endif
     QTemporaryDir dir;
     const QString log = dir.filePath(u"asked.txt"_s);
     const QString helper = dir.filePath(u"helper.sh"_s);
@@ -632,6 +638,9 @@ TEST_CASE("Station: a new ViewTouch looked for twice a day, installed at night o
 
 TEST_CASE("Station: a new ViewTouch not yet this computer's turn, paused or held isn't offered", "[station][helper][updates]")
 {
+#ifndef Q_OS_UNIX
+    SKIP("the station helper is a POSIX shell script, run with sudo; Windows kiosk parity is future work");
+#endif
     for (const char *said : {"SOON 9.9 2026-11-05T03:00", "PAUSED 9.9 0.15", "HELD 9.9 0.15"}) {
         INFO(said);
         QTemporaryDir dir;

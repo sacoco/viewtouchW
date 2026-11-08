@@ -107,8 +107,8 @@ TEST_CASE("Pictures: the touch picker finds them in Pictures and Documents, newe
 {
     QTemporaryDir home;
     REQUIRE(home.isValid());
-    const QByteArray oldHome = qgetenv("HOME");
-    qputenv("HOME", home.path().toUtf8());
+    const QByteArray oldRoot = qgetenv("VTM_PICTURE_TEST_ROOT");
+    qputenv("VTM_PICTURE_TEST_ROOT", home.path().toUtf8());
     QDir(home.path()).mkpath(u"Pictures/Logos"_s);
     QDir(home.path()).mkpath(u"Documents"_s);
     QImage img(8, 8, QImage::Format_RGB32);
@@ -126,7 +126,7 @@ TEST_CASE("Pictures: the touch picker finds them in Pictures and Documents, newe
     for (const QVariant &v : pos.pictureFiles())
         if (v.toMap()[u"path"_s].toString().startsWith(home.path()))
             names << v.toMap()[u"name"_s].toString();
-    qputenv("HOME", oldHome);
+    qputenv("VTM_PICTURE_TEST_ROOT", oldRoot);
     CHECK(names == QStringList{u"logo.png"_s, u"older.png"_s});   // one folder down too; no text files
 }
 

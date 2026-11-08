@@ -141,7 +141,10 @@ TEST_CASE("Crashes: where in the code it was, saved in the data folder", "[integ
 {
 #if defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_THREAD__)
     SKIP("the sanitizers report crashes themselves");
+#elif !defined(Q_OS_LINUX) || defined(Q_OS_ANDROID)
+    SKIP("the crash handler is only installed on desktop Linux");
 #endif
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID) && !defined(__SANITIZE_ADDRESS__) && !defined(__SANITIZE_THREAD__)
     QTemporaryDir dir;
     QProcess program;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -165,4 +168,5 @@ TEST_CASE("Crashes: where in the code it was, saved in the data folder", "[integ
     CHECK(text.startsWith(u"ViewTouch "_s));
     CHECK(text.contains(u"crashed: SIGSEGV"_s));
     CHECK(text.count(u'\n') > 3);   // the frames
+#endif
 }

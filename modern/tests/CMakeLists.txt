@@ -20,6 +20,7 @@ else()
     target_link_libraries(vtm_tests PRIVATE vtm_ui vtm_uiplugin Qt6::Test)
     target_compile_definitions(vtm_tests PRIVATE VTM_SEED_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../seed"
                                                  VTM_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures/pages"
+                                                 VTM_FONT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fonts"
                                                  VTM_PROGRAM="$<TARGET_FILE:vtmodern>")
 endif()
 

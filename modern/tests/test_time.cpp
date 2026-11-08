@@ -7,8 +7,6 @@
 #include <QDateTime>
 #include <QTimeZone>
 
-#include <ctime>
-
 using namespace Qt::StringLiterals;
 using namespace vt;
 using vt::app::PosService;
@@ -16,31 +14,23 @@ using vt::app::PosService;
 // Time as a store lives it: clocks that change for daylight saving (a day
 // of 23 hours in March, 25 in November), a clock set back by the internet,
 // a day left open over a long weekend. The store here is in Chicago.
+//
+// Pinned explicitly to America/Chicago (rather than faking the process's
+// local time, which Qt resolves from the real OS setting on Windows and
+// ignores the TZ environment variable for): deterministic on every platform,
+// and never depends on - or touches - the machine's own clock settings.
 
 namespace {
 
-// The computer's zone for one test, put back after.
-struct Zone {
-    QByteArray was;
-    bool had;
-    explicit Zone(const char *zone) : was(qgetenv("TZ")), had(qEnvironmentVariableIsSet("TZ"))
-    {
-        qputenv("TZ", zone);
-        tzset();
-    }
-    ~Zone()
-    {
-        if (had)
-            qputenv("TZ", was);
-        else
-            qunsetenv("TZ");
-        tzset();
-    }
-};
+const QTimeZone &chicago()
+{
+    static const QTimeZone zone("America/Chicago");
+    return zone;
+}
 
 std::int64_t at(int y, int m, int d, int h, int min)
 {
-    return QDateTime(QDate(y, m, d), QTime(h, min)).toMSecsSinceEpoch();
+    return QDateTime(QDate(y, m, d), QTime(h, min), chicago()).toMSecsSinceEpoch();
 }
 
 // The labor report's hours today for one person, as ViewTouch works them out.
@@ -51,8 +41,8 @@ std::string hoursToday(const core::TimePunch &p, std::int64_t now)
     e.id = p.employeeId;
     e.name = "Sam";
     const core::ReportContext ctx{settings, "Today", [](std::int64_t) { return std::string("1:00 AM"); }, now,
-                                  [](std::int64_t ms) { return QDateTime::fromMSecsSinceEpoch(ms).time().hour(); },
-                                  [](std::int64_t ms) { return int(QDateTime::fromMSecsSinceEpoch(ms).date().toJulianDay()); },
+                                  [](std::int64_t ms) { return QDateTime::fromMSecsSinceEpoch(ms, chicago()).time().hour(); },
+                                  [](std::int64_t ms) { return int(QDateTime::fromMSecsSinceEpoch(ms, chicago()).date().toJulianDay()); },
                                   now - 3 * 86'400'000LL};
     const core::Report r = core::laborReport({p}, {e}, ctx);
     bool hours = false;   // the "Hours and overtime" part: Sam, today, this week...
@@ -69,8 +59,7 @@ std::string hoursToday(const core::TimePunch &p, std::int64_t now)
 
 TEST_CASE("Time: a shift across the November change is the hours worked, not the clock's", "[time][dst]")
 {
-    Zone chicago("America/Chicago");
-    REQUIRE(QDateTime::fromMSecsSinceEpoch(at(2026, 11, 1, 12, 0)).offsetFromUtc() == -6 * 3600);   // CST that day
+    REQUIRE(QDateTime::fromMSecsSinceEpoch(at(2026, 11, 1, 12, 0), chicago()).offsetFromUtc() == -6 * 3600);   // CST that day
     // 10 PM Saturday to 4 AM Sunday: the clock reads 6 hours; 7 were worked (1 AM came twice).
     core::TimePunch p;
     p.id = 1;
@@ -84,7 +73,6 @@ TEST_CASE("Time: a shift across the November change is the hours worked, not the
 
 TEST_CASE("Time: a shift across the March change is the hours worked, not the clock's", "[time][dst]")
 {
-    Zone chicago("America/Chicago");
     // 1:30 to 3:30 AM on March 8, 2026: 2 AM never came; 1 hour worked.
     core::TimePunch p;
     p.id = 1;
@@ -97,7 +85,13 @@ TEST_CASE("Time: a shift across the March change is the hours worked, not the cl
 
 TEST_CASE("Time: time off on the 25-hour day sees a shift that starts late that night", "[time][dst]")
 {
-    Zone chicago("America/Chicago");
+    // Unlike at() above, the app's own day-boundary math (nextMidnight, for
+    // real stores) reads the clock's actual zone, not an explicit one - a
+    // real store's computer is really in it. There's no way to point that
+    // at Chicago without changing the machine's own time zone, which a test
+    // must not do; run this one only where that already happens to be true.
+    if (QDateTime(QDate(2026, 11, 1), QTime(0, 0)).offsetFromUtc() != -6 * 3600)
+        SKIP("this machine's own time zone isn't set to one with America/Chicago's November 1, 2026 change");
     PosService pos(test::seedPosData(), nullptr);
     REQUIRE(pos.loginWithPin(u"1234"_s));
     const std::string sam = pos.shared()->employees.front().id;
@@ -148,7 +142,6 @@ TEST_CASE("Time: the clock set back (the internet fixing it): no order waits a n
 
 TEST_CASE("Time: a day left open over a long weekend closes as one day, its reports dated", "[time][days]")
 {
-    Zone chicago("America/Chicago");
     PosService pos(test::seedPosData(), nullptr);
     std::int64_t clock = at(2026, 7, 3, 11, 0);   // Friday
     pos.shared()->setClock([&clock] { return clock; });

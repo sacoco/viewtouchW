@@ -55,6 +55,23 @@ QString pullThePlug(const QString &db, const QString &to)
     return copy;
 }
 
+// vtmodern itself, to run as a real program: next to the tests (a one-folder
+// build, like this one on Windows) or one level up (a multi-config build's
+// tests/ subfolder, like Linux's). Empty if it isn't built.
+QString vtmodernExe()
+{
+#ifdef Q_OS_WIN
+    const QString suffix = u".exe"_s;
+#else
+    const QString suffix = u""_s;
+#endif
+    for (const QString &candidate : {QCoreApplication::applicationDirPath() + u"/vtmodern"_s + suffix,
+                                     QCoreApplication::applicationDirPath() + u"/../vtmodern"_s + suffix})
+        if (QFile::exists(candidate))
+            return candidate;
+    return {};
+}
+
 } // namespace
 
 TEST_CASE("Power cut mid-service: committed sales and the open check survive", "[safety]")
@@ -459,8 +476,8 @@ TEST_CASE("Demo data: months of real service, everything in use, then refuses a 
 TEST_CASE("Factory reset: backed up, then a fresh store", "[demo][backup][program]")
 {
     QTemporaryDir dir;
-    const QString exe = QCoreApplication::applicationDirPath() + u"/../vtmodern"_s;
-    if (!QFile::exists(exe))
+    const QString exe = vtmodernExe();
+    if (exe.isEmpty())
         SKIP("vtmodern is not built next to the tests");
     QProcess p;
     p.setProcessEnvironment([] { auto e = QProcessEnvironment::systemEnvironment(); e.insert(u"QT_QPA_PLATFORM"_s, u"offscreen"_s); return e; }());
@@ -483,8 +500,8 @@ TEST_CASE("Factory reset: backed up, then a fresh store", "[demo][backup][progra
 TEST_CASE("Factory reset to an empty store: no menu, tables or sample staff, and it stays empty", "[demo][backup][reset][program]")
 {
     QTemporaryDir dir;
-    const QString exe = QCoreApplication::applicationDirPath() + u"/../vtmodern"_s;
-    if (!QFile::exists(exe))
+    const QString exe = vtmodernExe();
+    if (exe.isEmpty())
         SKIP("vtmodern is not built next to the tests");
     QProcess p;
     p.setProcessEnvironment([] { auto e = QProcessEnvironment::systemEnvironment(); e.insert(u"QT_QPA_PLATFORM"_s, u"offscreen"_s); return e; }());

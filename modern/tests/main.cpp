@@ -54,6 +54,18 @@ int main(int argc, char *argv[])
 {
     if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
         qputenv("QT_QPA_PLATFORM", "offscreen");
+    // QSettings needs these for a well-formed location on every backend -
+    // on Windows, an unset organization leaves it nowhere to write in the
+    // registry at all. Its own name, not the real app's: tests never touch
+    // whatever a real install on this machine has saved.
+    QCoreApplication::setOrganizationName(QStringLiteral("ViewTouch"));
+    QCoreApplication::setApplicationName(QStringLiteral("ViewTouchModernTests"));
+    // The offscreen platform measures text with its own font database, not
+    // the real screen's (Linux finds a system font through fontconfig;
+    // Windows has none to find at all). A font fixed here either way: the
+    // same metrics everywhere, not whatever happens to be installed.
+    if (qEnvironmentVariableIsEmpty("QT_QPA_FONTDIR"))
+        qputenv("QT_QPA_FONTDIR", VTM_FONT_DIR);
     // Warnings (QML errors among them) on the screen, not the system journal.
     qputenv("QT_FORCE_STDERR_LOGGING", "1");
     QGuiApplication app(argc, argv);

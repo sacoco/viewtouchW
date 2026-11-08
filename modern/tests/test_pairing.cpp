@@ -13,6 +13,11 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 
+#ifdef Q_OS_WIN
+#include <aclapi.h>
+#include <windows.h>
+#endif
+
 using namespace Qt::StringLiterals;
 using namespace vt;
 using vt::app::PosService;
@@ -199,8 +204,32 @@ TEST_CASE("Paired credentials are saved for the owner only", "[pairing]")
     c.key = net::newDeviceKey();
     const QString file = dir.filePath(u"terminal.json"_s);
     REQUIRE(c.save(file));
+#ifdef Q_OS_WIN
+    // QFile::permissions() on NTFS only emulates the read-only attribute;
+    // it mirrors "owner" access onto every class and can't see a real ACL.
+    // Check the ACL itself: exactly one entry, for this process's own user,
+    // nothing inherited from the folder (e.g. the Users group) survives.
+    {
+        const std::wstring wfile = file.toStdWString();
+        PSID ownerSid = nullptr;
+        PACL dacl = nullptr;
+        PSECURITY_DESCRIPTOR sd = nullptr;
+        REQUIRE(GetNamedSecurityInfoW(const_cast<LPWSTR>(wfile.c_str()), SE_FILE_OBJECT,
+                                       OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION, &ownerSid, nullptr,
+                                       &dacl, nullptr, &sd) == ERROR_SUCCESS);
+        REQUIRE(dacl != nullptr);
+        CHECK(dacl->AceCount == 1);
+        if (dacl->AceCount == 1) {
+            ACCESS_ALLOWED_ACE *ace = nullptr;
+            REQUIRE(GetAce(dacl, 0, reinterpret_cast<LPVOID *>(&ace)));
+            CHECK(EqualSid(reinterpret_cast<PSID>(&ace->SidStart), ownerSid));
+        }
+        LocalFree(sd);
+    }
+#else
     CHECK(QFile::permissions(file) == (QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser
                                        | QFileDevice::WriteUser));
+#endif
     const auto back = net::Credentials::load(file);
     REQUIRE(back);
     CHECK(back->key == c.key);
