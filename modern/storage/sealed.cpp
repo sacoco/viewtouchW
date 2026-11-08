@@ -1,5 +1,7 @@
 #include "storage/sealed.hh"
 
+#include "core/file_lock.hh"
+
 #include <QFile>
 #include <QLibrary>
 #include <QSaveFile>
@@ -44,11 +46,25 @@ struct Crypto {
         static const Crypto c = [] {
             Crypto c;
             static QLibrary lib;
+#ifdef Q_OS_WIN
+            // OpenSSL's own Windows binaries (the "Win64 OpenSSL" installer,
+            // and every distro built from its sources) name the DLL this
+            // way; there's no SONAME-style version suffix to look for. Every
+            // major still in use, newest first.
+            for (const QString &name : {u"libcrypto-4-x64"_s, u"libcrypto-4-arm64"_s, u"libcrypto-4"_s,
+                                        u"libcrypto-3-x64"_s, u"libcrypto-3-arm64"_s, u"libcrypto-3"_s,
+                                        u"libcrypto-1_1-x64"_s, u"libcrypto-1_1"_s, u"libcrypto"_s}) {
+                lib.setFileNameAndVersion(name, QString());
+                if (lib.load())
+                    break;
+            }
+#else
             for (const auto &[name, version] : {std::pair{u"crypto"_s, u"3"_s}, std::pair{u"crypto"_s, QString()}}) {
                 lib.setFileNameAndVersion(name, version);
                 if (lib.load())
                     break;
             }
+#endif
             if (!lib.isLoaded()) {
                 c.error = u"OpenSSL's libcrypto was not found."_s;
                 return c;
@@ -114,6 +130,7 @@ bool writeAll(const QString &file, const QByteArray &data, QString *error)
         return false;
     }
     QFile(file).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    core::restrictToCurrentUser(file.toStdString());
     return true;
 }
 

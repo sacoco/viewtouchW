@@ -1,5 +1,7 @@
 #include "stationcontroller.hh"
 
+#include "core/file_lock.hh"
+
 #include <QDateTime>
 #include <QCoreApplication>
 #include <QCryptographicHash>
@@ -214,6 +216,7 @@ bool StationController::save()
     if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return false;
     f.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    vt::core::restrictToCurrentUser(f.fileName().toStdString());
     const QJsonObject o{{u"role"_s, role_}, {u"name"_s, name_}, {u"pinHash"_s, pinHash_}, {u"pinSalt"_s, pinSalt_},
                         {u"rotation"_s, rotation_}, {u"lockPower"_s, lockPower_}, {u"autoUpdate"_s, autoUpdate_}};
     return f.write(QJsonDocument(o).toJson()) > 0;

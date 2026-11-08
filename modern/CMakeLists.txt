@@ -35,10 +35,13 @@ set(VTM_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
 add_library(vtm_core STATIC
     core/money.hh core/tax.hh core/menu.hh core/employee.hh core/check.hh core/settings.hh
     core/day.hh core/report.hh core/customer.hh core/waitlist.hh core/inventory.hh
-    core/rush.hh
-    core/core.cpp core/report.cpp core/rush.cpp
+    core/rush.hh core/file_lock.hh
+    core/core.cpp core/report.cpp core/rush.cpp core/file_lock.cpp
 )
 target_include_directories(vtm_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(WIN32)
+    target_link_libraries(vtm_core PUBLIC advapi32)
+endif()
 
 # ---------------------------------------------------------------------------
 # Qt6 parts. Skipped (with a warning) when Qt6 dev files are missing so the

@@ -1,5 +1,7 @@
 #include "net/pairing.hh"
 
+#include "core/file_lock.hh"
+
 #include <QFile>
 #include <QFileDevice>
 #include <QJsonDocument>
@@ -141,6 +143,7 @@ bool Credentials::save(const QString &file, QString *error) const
             *error = f.errorString();
         return false;
     }
+    core::restrictToCurrentUser(file.toStdString());
     return true;
 }
 
