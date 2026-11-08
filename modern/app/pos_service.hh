@@ -839,6 +839,9 @@ public:
     QString clockedInSince() const override;
     QString storeName() const override;
     QString currencySymbol() const override;
+    QString decimalSeparator() const override;
+    QString thousandsSeparator() const override;
+    int decimalPlaces() const override;
     QStringList customColors() const override;
     QVariantList priceChanges() const override;
     int pinLength() const override { return int(pin_.size()); }

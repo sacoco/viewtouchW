@@ -25,6 +25,8 @@
   ],
   "storeName": "ViewTouch Caf\u00e9",
   "currencySymbol": "$",
+  "decimalSeparator": ".",
+  "thousandsSeparator": "",
   "openingChecklist": [
     "Count the starting cash",
     "Turn on the grill and fryers",

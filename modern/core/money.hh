@@ -73,13 +73,42 @@ public:
     // three-decimal rates (Quebec QST) are exact.
     constexpr Money ppm(std::int64_t partsPerMillion) const { return scaled(partsPerMillion, 1000000); }
 
-    // "12.34", "-0.05"
+    // "12.34", "-0.05" - the stable, machine-readable form (JSON, CSV):
+    // always a plain decimal point, never grouped. Never changes shape;
+    // other code parses this back.
     std::string toString() const
     {
         const std::int64_t a = cents_ < 0 ? -cents_ : cents_;
         std::string frac = std::to_string(a % 100);
         if (frac.size() < 2) frac.insert(0, "0");
         return (cents_ < 0 ? "-" : "") + std::to_string(a / 100) + "." + frac;
+    }
+
+    // For a person to read: a chosen decimal point, a thousands separator
+    // (empty: none shown), and how many digits after the point - 0 for a
+    // currency with no sub-unit in everyday use (the Colombian or Chilean
+    // peso, the yen...). "1,234.56", "1.234,56", "1.234" (places 0).
+    // Still exact underneath: this only rounds and punctuates what's shown.
+    std::string format(const std::string &decimalPoint = ".", const std::string &groupSeparator = {},
+                        int places = 2) const
+    {
+        const int shown = places < 0 ? 0 : places > 2 ? 2 : places;
+        const std::int64_t placeDigits = shown == 0 ? 1 : shown == 1 ? 10 : 100;
+        const std::int64_t divisor = 100 / placeDigits;    // raw cents per smallest shown digit
+        const std::int64_t a = cents_ < 0 ? -cents_ : cents_;
+        const std::int64_t units = (a + divisor / 2) / divisor;   // rounded, half away from zero
+        std::string whole = std::to_string(units / placeDigits);
+        if (!groupSeparator.empty())
+            for (int pos = int(whole.size()) - 3; pos > 0; pos -= 3)
+                whole.insert(std::size_t(pos), groupSeparator);
+        std::string out = (cents_ < 0 && units != 0 ? "-" : "") + whole;
+        if (shown > 0) {
+            std::string frac = std::to_string(units % placeDigits);
+            while (int(frac.size()) < shown)
+                frac.insert(0, "0");
+            out += decimalPoint + frac;
+        }
+        return out;
     }
 
 private:

@@ -48,6 +48,8 @@ TicketContext TicketPrinter::context(const PosSettings &settings) const
         [code = i18n::printLanguage(QString::fromStdString(settings.language))](const std::string &english) {
             return i18n::phrase(code, QString::fromStdString(english)).toStdString();
         },
+        i18n::decimalSeparator(settings).toStdString(),
+        i18n::thousandsSeparator(settings).toStdString(),
     };
 }
 

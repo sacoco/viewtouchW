@@ -735,7 +735,8 @@ bool PosService::fail(const QString &message)
 
 QString PosService::format(Money amount) const
 {
-    const QString s = qs(amount.toString());
+    const QString s = qs(amount.format(decimalSeparator().toStdString(), thousandsSeparator().toStdString(),
+                                        s_->settings.decimalPlaces));
     return s.startsWith(u'-') ? u"-"_s + qs(s_->settings.currencySymbol) + s.mid(1)
                               : qs(s_->settings.currencySymbol) + s;
 }
@@ -2432,6 +2433,21 @@ QStringList PosService::permissions() const
 QString PosService::currencySymbol() const
 {
     return qs(s_->settings.currencySymbol);
+}
+
+QString PosService::decimalSeparator() const
+{
+    return i18n::decimalSeparator(s_->settings);
+}
+
+QString PosService::thousandsSeparator() const
+{
+    return i18n::thousandsSeparator(s_->settings);
+}
+
+int PosService::decimalPlaces() const
+{
+    return s_->settings.decimalPlaces;
 }
 
 QStringList PosService::customColors() const

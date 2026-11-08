@@ -378,6 +378,19 @@ QVariantList PosService::adminFieldsAll(const QString &panel)
             with(with(field(u"startPage.host"_s, tr("Hosts start on"), u"page"_s), u"emptyText"_s, tr("(the seating screen)")), u"pages"_s, u"floor"_s),
             with(with(field(u"startPage.manager"_s, tr("Managers start on"), u"page"_s), u"emptyText"_s, tr("(the floor plan)")), u"pages"_s, u"floor"_s),
             field(u"currencySymbol"_s, tr("Currency symbol"), u"string"_s),
+            with(with(field(u"decimalPlaces"_s, tr("Decimal places"), u"int"_s,
+                            tr("0 for a currency with no sub-unit in everyday use, like the Colombian or "
+                               "Chilean peso.")),
+                      u"min"_s, 0), u"max"_s, 2),
+            with(field(u"decimalSeparator"_s, tr("Decimal separator"), u"string"_s,
+                       tr("Leave both this and Thousands separator empty for whatever this computer's own "
+                          "region uses; set either one and both are used exactly as set (Thousands separator "
+                          "may rightly be empty - no grouping at all).")),
+                 u"emptyText"_s, tr("(this computer's own)")),
+            with(field(u"thousandsSeparator"_s, tr("Thousands separator"), u"string"_s,
+                       tr("Empty: no grouping, or - with Decimal separator also empty - whatever this "
+                          "computer's own region uses.")),
+                 u"emptyText"_s, tr("(this computer's own, or none)")),
             field(u"receiptHeader"_s, tr("Receipt header"), u"text"_s, tr("Address, phone… one per line")),
             field(u"receiptFooter"_s, tr("Receipt footer"), u"text"_s),
             field(u"receiptFreeChoices"_s, tr("Free choices on receipts"), u"bool"_s,

@@ -168,6 +168,20 @@ struct PosSettings {
     // (#1, #2... each day), shown on the Now Serving board, the Orders page.
     bool orderNumbers = false;
     std::string currencySymbol = "$";
+    // How a price is punctuated for people to read (never how it's stored
+    // - that's always exact cents). Both empty: whatever this computer's
+    // own region uses (app::i18n); this only overrides that, for when the
+    // computer's region doesn't match the business's (a shared corporate
+    // image, say) or to make every paired screen agree regardless of its
+    // own. "," and "." for most of Latin America and Europe; "." and ","
+    // for the US and a few others. The pair is one choice, not two: set
+    // either one (thousandsSeparator may rightly be "" - no grouping at
+    // all) and both are read exactly as set, with no region to fall back to.
+    std::string decimalSeparator;
+    std::string thousandsSeparator;
+    // Digits after the point: 0 for a currency with no sub-unit in
+    // everyday use, like the Colombian or Chilean peso.
+    int decimalPlaces = 2;
     // Colors the store mixed itself (custom colors), the newest first.
     std::vector<std::string> customColors;
     // Price changes set for later (Prices… → Later): at `at` (epoch ms) the

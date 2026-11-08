@@ -55,6 +55,11 @@ TEST_CASE("A store saved by an older ViewTouch: opened, nothing lost, its day's 
     QStringList problems;
     std::optional<app::PosData> data = store.load(&problems);
     REQUIRE(data);
+    // Compared below against reports an old release printed, in its own
+    // format - not however this machine's region happens to be set,
+    // which an upgrade correctly picks up for real (its own test: i18n).
+    data->settings.decimalSeparator = ".";
+    data->settings.thousandsSeparator = "";
     CHECK(problems.isEmpty());
     CHECK(data->menu.size() > 20);
     CHECK(data->employees.size() > 5);

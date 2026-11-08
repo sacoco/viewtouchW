@@ -1024,6 +1024,8 @@ QJsonObject toJson(const PosSettings &s)
         {u"schemaVersion"_s, PosSchemaVersion},
         {u"storeName"_s, qs(s.storeName)}, {u"setupDone"_s, s.setupDone},
         {u"currencySymbol"_s, qs(s.currencySymbol)},
+        {u"decimalSeparator"_s, qs(s.decimalSeparator)}, {u"thousandsSeparator"_s, qs(s.thousandsSeparator)},
+        {u"decimalPlaces"_s, s.decimalPlaces},
         {u"customColors"_s, [&s] { QJsonArray a; for (const std::string &c : s.customColors) a.append(qs(c)); return a; }()},
         {u"priceChanges"_s, [&s] {
              QJsonArray a;
@@ -1273,6 +1275,9 @@ PosSettings settingsFromJson(const QJsonObject &o)
     s.storeName = ss(o.value(u"storeName").toString(qs(s.storeName)));
     s.setupDone = o.value(u"setupDone").toBool(false);
     s.currencySymbol = ss(o.value(u"currencySymbol").toString(qs(s.currencySymbol)));
+    s.decimalSeparator = ss(o.value(u"decimalSeparator").toString(qs(s.decimalSeparator)));
+    s.thousandsSeparator = ss(o.value(u"thousandsSeparator").toString(qs(s.thousandsSeparator)));
+    s.decimalPlaces = o.value(u"decimalPlaces").toInt(s.decimalPlaces);
     for (const QJsonValue &c : o.value(u"customColors").toArray())
         s.customColors.push_back(ss(c.toString()));
     for (const QJsonValue &v : o.value(u"priceChanges").toArray()) {

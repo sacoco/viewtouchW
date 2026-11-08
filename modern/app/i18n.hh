@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/settings.hh"
+
 #include <QJsonObject>
 #include <QLocale>
 #include <QString>
@@ -51,6 +53,14 @@ QString dateTimeText(const QDateTime &when, const QString &code = {});
 // What a printer can print `code` in: the language itself, or English
 // for one its letters can't show (Chinese).
 QString printLanguage(const QString &code);
+// How a price looks: the store's own choice (PosSettings::decimalSeparator
+// / thousandsSeparator - set either one and both are read exactly as set),
+// or - neither set, the ordinary case - this computer's own region (not
+// the chosen language: a Spanish-reading cashier on a US-region computer
+// still sees "1,234.56"; money reads like the business's country, not
+// whoever is looking at the screen).
+QString decimalSeparator(const core::PosSettings &settings);
+QString thousandsSeparator(const core::PosSettings &settings);
 // The customer display, receipts and tickets: the store's language.
 QString guestLanguage();
 void setGuestLanguage(const QString &code);

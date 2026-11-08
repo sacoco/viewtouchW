@@ -910,3 +910,19 @@ TEST_CASE("Receipts leave emoji out: \"🌶 Spicy Wings\" prints as Spicy Wings"
     CHECK(escpos.find("Spicy Wings") != std::string::npos);
     CHECK(escpos.find("\xF0\x9F") == std::string::npos);   // no emoji bytes
 }
+
+TEST_CASE("Receipts can read decimal-comma, thousands-point - Colombia's and most of Latin America's and Europe's",
+          "[print][money]")
+{
+    auto seed = test::seedPosData();
+    const core::Check c = burgerCheck(seed.settings, seed.menu);
+    const TicketContext context{seed.settings,
+                                 [](std::int64_t) { return std::string("Sep 29, 2026 10:31 AM"); },
+                                 [](std::int64_t) { return std::string("10:31 AM"); },
+                                 0, nullptr, nullptr, nullptr, ",", "."};
+    CHECK(context.money(Money::fromCents(1234567)) == "$12.345,67");
+    CHECK(context.money(Money::fromCents(-500)) == "-$5,00");
+    const std::string r = renderText(receipt(c, context), 42);
+    CHECK(contains(r, "$11,50"));     // the burger's price, comma decimal
+    CHECK_FALSE(contains(r, "11.50"));
+}

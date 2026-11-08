@@ -48,6 +48,11 @@ struct ReportContext {
     std::function<int(std::int64_t)> dayOf;           // epoch ms -> local day (any number per date)
     std::int64_t weekStart = 0;                       // start of the current pay week
     std::function<std::string(std::int64_t)> date;    // epoch ms -> "Oct 5" (empty: the clock)
+    // Already resolved (see app::i18n): this computer's own, unless the
+    // store overrides it. "." and "" match how a report always looked, so
+    // building one of these without them keeps doing that.
+    std::string decimalSeparator = ".";
+    std::string thousandsSeparator;
 
     std::string money(Money m) const;
 };
