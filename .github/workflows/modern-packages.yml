@@ -1,7 +1,8 @@
 # Packages of the new Qt ViewTouch (modern/) for Fedora, Debian / Raspberry
-# Pi OS and Ubuntu, on x86_64 and aarch64. Run it from the Actions tab (the
-# packages are attached to the run), or push a modern-v* tag: Modern release
-# builds them and publishes the Debian 13 ones.
+# Pi OS and Ubuntu (x86_64 and aarch64) and Windows (x86_64). Run it from
+# the Actions tab (the packages are attached to the run), or push a
+# modern-v* tag: Modern release builds them and publishes the Debian 13
+# and Windows ones.
 name: Modern packages
 
 on:
@@ -53,6 +54,42 @@ jobs:
           path: |
             modern/dist/*.deb
             modern/dist/*.rpm
+          if-no-files-found: error
+
+  package-windows:
+    name: windows x86_64
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # every commit: the build number is their count
+
+      # windows-2022 already has the WiX Toolset v3 CPack's WIX generator
+      # needs, and OpenSSL (Win64 OpenSSL) for encrypted backups.
+      - name: Find this runner's OpenSSL
+        id: openssl
+        shell: pwsh
+        run: |
+          $dir = (Get-Command openssl.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source | Split-Path -Parent)
+          if (-not $dir) { Write-Warning "No OpenSSL found: the package will have no encrypted-backup support." }
+          "dir=$dir" >> $env:GITHUB_OUTPUT
+
+      - name: Fetch Qt
+        shell: pwsh
+        run: modern\tools\get-qt.ps1 -Prefix C:\Qt\qt
+
+      - name: Build the package
+        shell: pwsh
+        env:
+          VTM_QT: C:\Qt\qt
+          VTM_OPENSSL_DIR: ${{ steps.openssl.outputs.dir }}
+        run: modern\packaging\build-windows-package.ps1 -QtDir $env:VTM_QT -OpenSslDir $env:VTM_OPENSSL_DIR
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vtmodern-windows-x86_64
+          path: modern/dist/*.msi
           if-no-files-found: error
 
   # What stores go through: the version they run now (the one published on
